@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="message-box">
+    <h2>Chat Room: {{room}} </h2>
+    <div class="messages" id="messages">
+        <div class="inputs">
+            <input 
+            type="text" 
+            placeholder="Message"
+            id="message"
+            name="message" 
+         
+            
+            />
+            <button 
+            type="button" 
+            onclick="sendMessage()" 
+            name="send" 
+            id="send-btn"></button>
+            
+        </div>
+
+    </div>
+    <script type="text/javascript">
+        var socketio=io();
+        const sendMessage=()=>{
+            console.log("send");
+            
+        }
+
+    </script>
+</div>
+
+{% endblock %}
