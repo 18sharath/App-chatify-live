@@ -1,34 +1,47 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="message-box">
-    <h2>Chat Room: {{room}} </h2>
-    <div class="messages" id="messages">
-        <div class="inputs">
-            <input 
-            type="text" 
-            placeholder="Message"
-            id="message"
-            name="message" 
-         
-            
-            />
-            <button 
-            type="button" 
-            onclick="sendMessage()" 
-            name="send" 
-            id="send-btn"></button>
-            
-        </div>
-
+<div class="message-box ">
+    <h2>Chat Room: {{ room }} </h2>
+    <div class="messages" id="messages"> </div>
+    <div class="inputs">
+        <input type="text" placeholder="Message" id="message" name="message" />
+        <button type="button" onClick="sendMessage()" name="send" id="send-btn">Send</button>
     </div>
-    <script type="text/javascript">
-        var socketio=io();
-        const sendMessage=()=>{
-            console.log("send");
-            
-        }
 
-    </script>
 </div>
+<script type="text/javascript">
+    var socketio = io();
+    const messages = document.getElementById('messages')
+    const createMessage = (name, msg) => {  // this is the function to store the messeges in content 
+        const content = `
+            <div class='text'>
+                <span> 
+                    <strong> ${name} </strong>: ${msg}
+                </span>
+                <span class='muted'>
+                    ${new Date().toLocaleString()}
+                </span>
+            </div>
+        `;
+        messages.innerHTML+=content;
+
+    };
+    socketio.on('message',(data)=>{
+        createMessage(data.name,data.message);
+
+
+    });
+
+
+    const sendMessage = () => {
+        const message=document.getElementById('message');
+        if(message.value=='')return ;
+        socketio.emit('message',{data :message.value}) // it is json, sends a message to the server
+        message.value=""; 
+    };
+
+</script>
+
+
 
 {% endblock %}

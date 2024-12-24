@@ -21,3 +21,34 @@
     width: 100%;
 
 }
+
+.message-box{
+    border-color: black;
+    border-width:2px;
+    border-style: solid;
+    border-radius: 10px;
+    background-color: whitesmoke;
+    height: 80vh;
+    display: flex;
+    flex-direction: column;
+    width: 80vw;
+    align-items: stretch;
+
+}
+.messages{
+    overflow-y: scroll;
+    width:100%;
+    flex: 1;
+}
+
+.inputs{
+    padding: 10px;
+    display: flex;
+}
+#messages{
+    flex:1;
+}
+h2{
+    text-align: center;
+
+}

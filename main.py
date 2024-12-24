@@ -50,8 +50,8 @@ def home():
         elif code not in rooms:
             return render_template("home.html",error='room doesn\'t exist' )
         
-        session[room]=room
-        session[name]=name
+        session['room']=room
+        session['name']=name
         return redirect(url_for('room'))
 
     return render_template('home.html')
@@ -60,12 +60,58 @@ def home():
 def room():
     room=session.get('room')
 
-    if room is None or session.get('name') is None  or room not in rooms:
+    if room is None or session.get('name') is None or room not in rooms:
         return redirect(url_for('home'))
     
 
 
-    return render_template('room.html')
+
+    return render_template('room.html',code=room )
+
+@socketio.on('message')
+def message(data):
+    room=session.get("room")
+    if room not in rooms:
+        return 
+    content={
+        "name":session.get('name'),
+        "data":data['data']
+    }
+    send(content,to=room) ## send content to  all clients specific room 
+    rooms[room]['messages'].append(content)
+    print(f"{session.get('name')} said:{data['data']}")
+
+
+@socketio.on('connect') #Socket.IO is a popular JavaScript library used for real-time, bidirectional communication between web clients and servers.
+def connect(auth):
+    room=session.get('room')
+    name=session.get("name")
+    if not room or not name:
+        return 
+    
+    if room not in rooms:
+        leave_room(room)
+        return 
+    join_room(room)
+    send({"name": name, "message": "has entered the room."}, to=room)
+    rooms[room]['members']+=1
+    print(f'{name} has joined  the {room}')
+
+@socketio.on('disconnect')
+def disconnect():
+    room=session.get('room')
+    name=session.get("name")
+    leave_room(room)
+
+    if room in rooms:
+        rooms[room]['members'] -=1
+        if rooms[room]['members']<=0:
+            del rooms[room]
+
+    send({"name":name,"message":"has leave the room"},to=room)
+    print(f'{name} has left the {room}')
+
+
 
 if __name__== '__main__':
     socketio.run(app,debug=True) # debug=true is for continues adapting the changes wihtout running the app agian again 
